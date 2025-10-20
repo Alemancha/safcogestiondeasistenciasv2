@@ -1,261 +1,398 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    .dashboard-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .welcome-banner {
+        background: linear-gradient(120deg, rgba(229, 57, 53, 0.9), rgba(255, 138, 101, 0.88)), url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1400&q=80') center/cover;
+        color: #fff;
+        border-radius: 1.8rem !important;
+        overflow: hidden;
+    }
+
+    .welcome-banner .card-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+
+    .welcome-banner h2 {
+        font-size: clamp(1.7rem, 1.1rem + 1.4vw, 2.4rem);
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+    }
+
+    .welcome-banner p {
+        font-size: 1rem;
+        max-width: 560px;
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .welcome-banner .badge-pill {
+        align-self: flex-start;
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        border-radius: 999px;
+        font-weight: 600;
+        padding: 0.45rem 1.1rem;
+        letter-spacing: 0.02em;
+    }
+
+    .quick-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+    }
+
+    .quick-actions .btn {
+        border-radius: 1rem;
+        font-weight: 600;
+        backdrop-filter: blur(2px);
+        border: none;
+    }
+
+    .quick-metric .metric-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #94a3b8;
+        font-weight: 600;
+    }
+
+    .quick-metric .metric-value {
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .quick-metric canvas {
+        margin-top: 1.2rem;
+    }
+
+    .table-card .list-group-item {
+        border: none;
+        border-radius: 1rem;
+        margin-bottom: 0.8rem;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+    }
+
+    .table-card .avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(229, 57, 53, 0.2), rgba(255, 138, 101, 0.25));
+        display: grid;
+        place-items: center;
+        color: #e53935;
+        font-weight: 700;
+    }
+
+    .progress-soft {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(226, 232, 240, 0.8);
+    }
+
+    .progress-soft .progress-bar {
+        border-radius: inherit;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #0f172a;
+        padding: 0.35rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(14, 165, 233, 0.12);
+    }
+
+    .status-pill i {
+        color: #0284c7;
+    }
+
+    .card-divider {
+        height: 1px;
+        background: rgba(148, 163, 184, 0.2);
+        margin: 1.2rem 0;
+    }
+
+    .announcement-card {
+        background: rgba(15, 23, 42, 0.92);
+        color: #f8fafc;
+        border-radius: 1.6rem !important;
+    }
+
+    .announcement-card .list-group-item {
+        background: transparent;
+        border: none;
+        color: rgba(248, 250, 252, 0.85);
+        padding-left: 0;
+    }
+
+    @media (max-width: 992px) {
+        .quick-metric canvas {
+            max-height: 180px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .welcome-banner .card-body {
+            padding: 1.6rem !important;
+        }
+    }
+</style>
+@endpush
+
 @section('panel')
-<!DOCTYPE html>
-<html lang="es">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard | SAFCO Gestión de Asistencias</title>
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { background: #f5f6fa; }
-        .sidebar { min-height: 100vh; background: #fff; border-right: 1px solid #eaeaea; }
-        /* Sidebar estilo Sneat con color SAFCO */
-.sidebar {
-    min-height: 100vh;
-    background: #ea4335 !important;      /* Rojo SAFCO */
-    color: #fff !important;
-    border-right: none !important;
-    border-radius: 0 1.5rem 1.5rem 0;
-    box-shadow: 0 4px 20px 0 rgba(50,50,93,.07), 0 1.5px 7px 0 rgba(50,50,93,.06);
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-}
-
-.sidebar .nav-link,
-.sidebar .nav-link.active {
-    background: transparent !important;
-    color: #fff !important;
-    font-weight: 500;
-    border-radius: 12px;
-    margin-bottom: 6px;
-    padding: 10px 16px;
-    transition: background .2s;
-}
-
-.sidebar .nav-link.active,
-.sidebar .nav-link:hover {
-    background: #fff !important;
-    color: #ea4335 !important;
-}
-
-.icon-box {
-    background: rgba(255,255,255,0.12) !important;
-    color: #fff !important;
-    margin-right: 12px;
-    border-radius: 10px;
-}
-
-.sidebar .nav-link i {
-    color: #fff !important;
-    font-size: 1.25rem;
-    margin-right: 10px;
-}
-
-.sidebar .nav-link.active i,
-.sidebar .nav-link:hover i {
-    color: #ea4335 !important;
-}
-
-        .icon-box { width: 2.2rem; height: 2.2rem; background: #e9ecef; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 10px;}
-        .card-summary { border-radius: 1.5rem; }
-        .bi { vertical-align: -.125em; }
-        .shadow-sm { box-shadow: 0 4px 20px 0 rgba(50,50,93,.05), 0 1.5px 7px 0 rgba(50,50,93,.08) !important; }
-        .dashboard-label { font-size: .95rem; color: #636e72; }
-        .dashboard-stat { font-size: 2.2rem; font-weight: 700; }
-        .avatar-sm { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;}
-    </style>
-</head>
-<body>
-<div class="d-flex">
-
-    <!-- Main -->
-    <div class="flex-grow-1 p-4">
-        <!-- BIENVENIDA GRANDE -->
-        <div class="card shadow-sm mb-4" style="border-radius: 22px;">
-            <div class="card-body d-flex justify-content-between align-items-center" style="background: #fff;">
-                <div>
-                    <h2 class="fw-bold mb-1" style="font-size:2.1rem;">Bienvenido(a) a SAFCO | Gestión de Asistencias</h2>
-                    <div class="mb-0 text-muted" style="font-size:1.08rem;">
-                        Panel general de monitoreo y control
-                    </div>
-                </div>
-                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Usuario" width="72" style="border-radius: 60px; background:#e5edfa;">
+<div class="container-fluid px-0 px-xl-2 dashboard-grid">
+    <div class="card welcome-banner border-0">
+        <div class="card-body p-4 p-md-5">
+            <span class="badge-pill"><i class="bi bi-activity me-1"></i> Semana dinámica</span>
+            <h2>Gestiona asistencias, pagos y contratos desde un solo tablero</h2>
+            <p>
+                Visualiza los indicadores clave de la fuerza laboral agrícola y toma decisiones con datos en tiempo real.
+                Usa los accesos directos para registrar nuevos eventos en segundos.
+            </p>
+            <div class="quick-actions">
+                <a href="{{ url('asistencias/create') }}" class="btn btn-light text-danger">
+                    <i class="bi bi-calendar-plus me-2"></i> Registrar asistencia
+                </a>
+                <a href="{{ url('empleados/create') }}" class="btn btn-outline-light">
+                    <i class="bi bi-person-plus me-2"></i> Nuevo colaborador
+                </a>
+                <a href="{{ url('pagos') }}" class="btn btn-outline-light">
+                    <i class="bi bi-receipt me-2"></i> Revisar pagos
+                </a>
             </div>
         </div>
-        <!-- TARJETA DE FELICITACIÓN SNEAT -->
-        <div class="card shadow-sm mb-4" style="border-radius: 22px;">
-            <div class="card-body d-flex justify-content-between align-items-center" style="background: #fff;">
-                <div>
-                    <h5 class="fw-bold mb-2" style="color: #696cff;">
-                        ¡Felicidades, Ali! 🎉
-                    </h5>
-                    <div class="mb-2 text-muted" style="font-size:1rem;">
-                        Has gestionado 72% más asistencias esta semana.<br>
-                        Consulta tu nuevo logro en el perfil.
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-4">
+            <div class="card quick-metric h-100">
+                <div class="card-body p-4">
+                    <div class="metric-label">Asistencias semana</div>
+                    <div class="d-flex align-items-baseline gap-3 mt-1">
+                        <div class="metric-value">48</div>
+                        <span class="status-pill"><i class="bi bi-arrow-up-right"></i> +12%</span>
                     </div>
-                    <a href="#" class="btn btn-outline-primary btn-sm px-3 mt-1" style="border-radius: 8px;">Ver Logros</a>
+                    <p class="text-muted mb-0">Promedio general de equipos operativos</p>
+                    <canvas id="asistChart" height="140"></canvas>
                 </div>
-                <img src="https://cdni.iconscout.com/illustration/premium/thumb/man-working-on-laptop-6003730-4985033.png" alt="Celebración" width="100" style="border-radius: 12px; background:#f5f6fa;">
             </div>
         </div>
-        <!-- Dashboard principal -->
-        <div class="row g-4">
-
-            <!-- CARD 1 - Estadísticas Asistencias -->
-            <div class="col-12 col-md-4">
-                <div class="card card-summary shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="fw-semibold">Asistencias esta semana</span>
-                            <span class="avatar-sm bg-primary bg-opacity-10"><i class="bi bi-person-check text-primary fs-4"></i></span>
+        <div class="col-12 col-lg-4">
+            <div class="card quick-metric h-100">
+                <div class="card-body p-4">
+                    <div class="metric-label">Pagos realizados</div>
+                    <div class="d-flex align-items-baseline gap-3 mt-1">
+                        <div class="metric-value text-success">S/ 4,580</div>
+                        <span class="status-pill" style="background: rgba(34, 197, 94, 0.12); color: #047857;"><i class="bi bi-cash-stack"></i> 32 depósitos</span>
+                    </div>
+                    <p class="text-muted mb-0">Liquidaciones netas de la última semana</p>
+                    <canvas id="balanceChart" height="140"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="card quick-metric h-100">
+                <div class="card-body p-4">
+                    <div class="metric-label">Clima laboral</div>
+                    <div class="d-flex align-items-baseline gap-3 mt-1">
+                        <div class="metric-value text-primary">92%</div>
+                        <span class="status-pill" style="background: rgba(59, 130, 246, 0.12); color: #1d4ed8;"><i class="bi bi-emoji-smile"></i> Excelente</span>
+                    </div>
+                    <p class="text-muted mb-0">Encuesta semanal de satisfacción</p>
+                    <div class="card-divider"></div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1"><span>Compromiso</span><span>95%</span></div>
+                        <div class="progress progress-soft" role="progressbar" aria-label="Compromiso" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar bg-primary" style="width: 95%"></div>
                         </div>
-                        <div class="dashboard-stat text-primary">48</div>
-                        <div class="dashboard-label mb-3">Total asistencias</div>
-                        <canvas id="asistBarChart" height="80"></canvas>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1"><span>Puntualidad</span><span>88%</span></div>
+                        <div class="progress progress-soft" role="progressbar" aria-label="Puntualidad" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar bg-info" style="width: 88%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between mb-1"><span>Retención</span><span>90%</span></div>
+                        <div class="progress progress-soft" role="progressbar" aria-label="Retención" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar bg-success" style="width: 90%"></div>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- CARD 2 - Balance Semanal -->
-            <div class="col-12 col-md-4">
-                <div class="card card-summary shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="fw-semibold">Balance Semanal</span>
-                            <span class="avatar-sm bg-success bg-opacity-10"><i class="bi bi-currency-dollar text-success fs-4"></i></span>
-                        </div>
-                        <div class="dashboard-stat text-success">S/ 4,580</div>
-                        <div class="dashboard-label mb-3">Pagos netos</div>
-                        <canvas id="balanceChart" height="80"></canvas>
+    <div class="row g-4">
+        <div class="col-12 col-xl-7">
+            <div class="card table-card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="mb-0 fw-semibold">Pagos recientes</h5>
+                        <a href="{{ url('pagos') }}" class="btn btn-sm btn-outline-danger rounded-pill"><i class="bi bi-list"></i> Ver todo</a>
                     </div>
-                </div>
-            </div>
-
-            <!-- CARD 3 - Pagos Recientes -->
-            <div class="col-12 col-md-4">
-                <div class="card card-summary shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="fw-semibold">Pagos Recientes</span>
-                            <span class="avatar-sm bg-info bg-opacity-10"><i class="bi bi-cash-stack text-info fs-4"></i></span>
-                        </div>
-                        <ul class="list-unstyled mb-0">
-                            <li class="d-flex align-items-center mb-3">
-                                <span class="avatar-sm bg-primary bg-opacity-10 me-2"><i class="bi bi-person-circle text-primary"></i></span>
-                                <div class="flex-grow-1">
-                                    <div class="fw-bold">Ana Torres</div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar">AT</div>
+                                <div>
+                                    <div class="fw-semibold">Ana Torres</div>
                                     <small class="text-muted">Pago sueldo • 12/07</small>
                                 </div>
-                                <div class="fw-semibold text-success">+S/ 1200</div>
-                            </li>
-                            <li class="d-flex align-items-center mb-3">
-                                <span class="avatar-sm bg-success bg-opacity-10 me-2"><i class="bi bi-person-circle text-success"></i></span>
-                                <div class="flex-grow-1">
-                                    <div class="fw-bold">Juan Pérez</div>
+                            </div>
+                            <span class="fw-semibold text-success">+S/ 1,200</span>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar">JP</div>
+                                <div>
+                                    <div class="fw-semibold">Juan Pérez</div>
                                     <small class="text-muted">Bono puntualidad • 10/07</small>
                                 </div>
-                                <div class="fw-semibold text-success">+S/ 250</div>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <span class="avatar-sm bg-danger bg-opacity-10 me-2"><i class="bi bi-person-circle text-danger"></i></span>
-                                <div class="flex-grow-1">
-                                    <div class="fw-bold">Pedro Díaz</div>
+                            </div>
+                            <span class="fw-semibold text-success">+S/ 250</span>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar">PD</div>
+                                <div>
+                                    <div class="fw-semibold">Pedro Díaz</div>
                                     <small class="text-muted">Descuento • 09/07</small>
                                 </div>
-                                <div class="fw-semibold text-danger">-S/ 30</div>
-                            </li>
-                        </ul>
-                    </div>
+                            </div>
+                            <span class="fw-semibold text-danger">-S/ 30</span>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar">MG</div>
+                                <div>
+                                    <div class="fw-semibold">María Gómez</div>
+                                    <small class="text-muted">Liquidación extraordinaria • 08/07</small>
+                                </div>
+                            </div>
+                            <span class="fw-semibold text-success">+S/ 860</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
-        <!-- Segunda fila -->
-        <div class="row g-4 mt-1">
-            <div class="col-12 col-md-4">
-                <div class="card card-summary shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="fw-semibold mb-2">Empleados activos</div>
-                        <div class="d-flex align-items-center">
-                            <span class="avatar-sm bg-info bg-opacity-10 me-3"><i class="bi bi-person-badge text-info"></i></span>
-                            <span class="fs-3 fw-bold text-primary">52</span>
-                            <span class="ms-2 dashboard-label">/ 58</span>
+        <div class="col-12 col-xl-5">
+            <div class="card announcement-card h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-semibold mb-3">Próximas actividades</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 py-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-semibold text-white">Capacitación de seguridad agrícola</div>
+                                    <small>15 de julio • 09:30 a.m.</small>
+                                </div>
+                                <span class="badge rounded-pill bg-light text-dark">Áreas</span>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 py-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-semibold text-white">Auditoría de contratos temporales</div>
+                                    <small>17 de julio • 04:00 p.m.</small>
+                                </div>
+                                <span class="badge rounded-pill bg-primary">Contratos</span>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 py-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-semibold text-white">Cierre de nómina quincenal</div>
+                                    <small>18 de julio • 06:00 p.m.</small>
+                                </div>
+                                <span class="badge rounded-pill bg-warning text-dark">Pagos</span>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="card-divider"></div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="fw-semibold text-white">Tareas completadas esta semana</div>
+                            <small>28 de 32 actividades programadas</small>
                         </div>
-                        <div class="dashboard-label mt-2">En nómina</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4">
-                <div class="card card-summary shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="fw-semibold mb-2">Contratos vigentes</div>
-                        <div class="d-flex align-items-center">
-                            <span class="avatar-sm bg-warning bg-opacity-10 me-3"><i class="bi bi-file-earmark-text text-warning"></i></span>
-                            <span class="fs-3 fw-bold text-warning">49</span>
+                        <div class="text-end">
+                            <h2 class="mb-0 text-white">87%</h2>
+                            <small class="text-white-50">+5% vs semana anterior</small>
                         </div>
-                        <div class="dashboard-label mt-2">A la fecha</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4">
-                <div class="card card-summary shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="fw-semibold mb-2">Vacaciones solicitadas</div>
-                        <div class="d-flex align-items-center">
-                            <span class="avatar-sm bg-danger bg-opacity-10 me-3"><i class="bi bi-calendar3 text-danger"></i></span>
-                            <span class="fs-3 fw-bold text-danger">5</span>
-                        </div>
-                        <div class="dashboard-label mt-2">Este mes</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Chart.js Script -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Asistencias - Barras
-    new Chart(document.getElementById('asistBarChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'],
-            datasets: [{
-                label: 'Asistencias',
-                data: [7, 6, 5, 8, 9],
-                backgroundColor: '#6366f1',
-                borderRadius: 12,
-                maxBarThickness: 22
-            }]
-        },
-        options: { 
-            plugins: { legend: { display: false } }, 
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-    // Balance semanal - Línea
-    new Chart(document.getElementById('balanceChart'), {
-        type: 'line',
-        data: {
-            labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
-            datasets: [{
-                label: 'Balance S/.', data: [1200, 1150, 1100, 1130],
-                fill: true,
-                backgroundColor: 'rgba(99,102,241,0.1)',
-                borderColor: '#22c55e',
-                tension: .35
-            }]
-        },
-        options: { plugins: { legend: { display: false } } }
-    });
-});
-</script>
-</body>
-</html>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const asistCtx = document.getElementById('asistChart');
+    const balanceCtx = document.getElementById('balanceChart');
+
+    if (asistCtx) {
+        new Chart(asistCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+                datasets: [{
+                    label: 'Asistencias',
+                    data: [8, 7, 9, 8, 10, 6],
+                    backgroundColor: 'rgba(229, 57, 53, 0.7)',
+                    borderRadius: 12,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { grid: { color: 'rgba(148, 163, 184, 0.2)' }, beginAtZero: true, ticks: { stepSize: 2 } }
+                }
+            }
+        });
+    }
+
+    if (balanceCtx) {
+        new Chart(balanceCtx, {
+            type: 'line',
+            data: {
+                labels: ['Abr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    label: 'Ingresos',
+                    data: [3200, 3800, 4100, 4580],
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.18)',
+                    fill: true,
+                    tension: 0.45,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#10b981'
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { grid: { color: 'rgba(148, 163, 184, 0.2)' }, beginAtZero: false }
+                }
+            }
+        });
+    }
+</script>
+@endpush
