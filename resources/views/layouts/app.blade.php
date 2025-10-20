@@ -259,23 +259,40 @@
         .panel-header .user-pill {
             display: flex;
             align-items: center;
-            gap: 0.7rem;
-            padding: 0.4rem 0.85rem;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
             border-radius: 999px;
             background: rgba(15, 23, 42, 0.08);
             color: #1f2937;
-            font-weight: 600;
         }
 
         .panel-header .user-pill span.avatar {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--safco-red), #ff8a65);
             display: grid;
             place-items: center;
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .panel-header .user-pill .user-meta {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .panel-header .user-pill .user-meta .name {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .panel-header .user-pill .user-meta .email {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
         }
 
         .panel-inner {
@@ -398,11 +415,27 @@
         </div>
     </aside>
     <main class="main-panel-safco">
-        @php($today = \Carbon\Carbon::now()->locale('es'))
+        @php(
+            $today = \Carbon\Carbon::now()->locale('es')
+        )
+        @php(
+            $authUser = session('auth_user')
+        )
+        @php(
+            $initial = $authUser && !empty($authUser['name'])
+                ? mb_strtoupper(mb_substr($authUser['name'], 0, 1))
+                : null
+        )
         <header class="panel-header">
             <div class="headline">
                 <div class="kicker">Panel general</div>
-                <h1>Hola, bienvenido(a) a tu centro de control SAFCO</h1>
+                <h1>
+                    @if(!empty($authUser['name']))
+                        Hola {{ $authUser['name'] }}, este es tu centro de control SAFCO
+                    @else
+                        Hola, bienvenido(a) a tu centro de control SAFCO
+                    @endif
+                </h1>
                 <p>{{ $today->isoFormat('dddd D [de] MMMM [de] YYYY') }}</p>
             </div>
             <div class="actions">
@@ -417,8 +450,19 @@
                     <i class="bi bi-box-arrow-right"></i> Salir
                 </a>
                 <div class="user-pill">
-                    <span class="avatar"><i class="bi bi-person-fill"></i></span>
-                    <span>Administrador</span>
+                    <span class="avatar">
+                        @if($initial)
+                            {{ $initial }}
+                        @else
+                            <i class="bi bi-person-fill"></i>
+                        @endif
+                    </span>
+                    <div class="user-meta">
+                        <span class="name">{{ $authUser['name'] ?? 'Usuario SAFCO' }}</span>
+                        @if(!empty($authUser['email']))
+                            <span class="email">{{ $authUser['email'] }}</span>
+                        @endif
+                    </div>
                 </div>
             </div>
         </header>

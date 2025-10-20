@@ -1,34 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
 
 // 1. Login público
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 
-// 2. Proceso login simple (usuario fijo)
-Route::post('/login', function (Request $request) {
-    $validUser = 'admin@admin.com'; // Usuario permitido
-    $validPass = '12345678';        // Contraseña permitida
-
-    if (
-        $request->input('email') === $validUser &&
-        $request->input('password') === $validPass
-    ) {
-        session(['user' => $validUser]);
-        return redirect()->route('dashboard');
-    } else {
-        return back()->with('error', 'Usuario o contraseña incorrectos');
-    }
-})->name('login.custom');
+// 2. Proceso login validando contra la tabla de usuarios
+Route::post('/login', [AuthController::class, 'login'])->name('login.custom');
 
 // 3. Logout (cerrar sesión)
-Route::get('/logout', function () {
-    session()->forget('user');
-    return redirect()->route('login');
-})->name('logout');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // 4. TODAS las rutas protegidas
 Route::middleware(['checklogin'])->group(function () {

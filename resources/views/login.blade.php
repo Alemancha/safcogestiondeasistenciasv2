@@ -355,9 +355,12 @@
         @if(session('error'))
           <div class="alert-error"><i class='bx bxs-error-circle'></i>{{ session('error') }}</div>
         @endif
+        @if ($errors->any())
+          <div class="alert-error"><i class='bx bxs-error-circle'></i>{{ $errors->first() }}</div>
+        @endif
         <label class="login-label" for="login-email">Email o Usuario</label>
         <div class="input-icon-box">
-          <input type="text" name="email" id="login-email" class="login-input" placeholder="Ingresa tu correo corporativo" autocomplete="username" required>
+          <input type="text" name="email" id="login-email" class="login-input" placeholder="Ingresa tu correo corporativo" autocomplete="username" required value="{{ old('email') }}">
           <i class='bx bxs-user'></i>
         </div>
         <label class="login-label" for="login-password">Contraseña</label>
@@ -367,7 +370,7 @@
         </div>
         <div class="login-row">
           <label for="remember" style="display:flex; align-items:center; color: var(--text-muted); font-weight:500;">
-            <input type="checkbox" id="remember" class="login-checkbox">
+            <input type="checkbox" id="remember" name="remember" class="login-checkbox" value="1">
             Recordar sesión
           </label>
           <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>

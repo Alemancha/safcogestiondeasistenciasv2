@@ -9,7 +9,7 @@ class CheckLogin
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!session('user')) {
+        if (!session()->has('auth_user')) {
             return redirect()->route('login');
         }
         return $next($request);
