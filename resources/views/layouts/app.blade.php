@@ -415,28 +415,20 @@
         </div>
     </aside>
     <main class="main-panel-safco">
-        @php(
-            $today = \Carbon\Carbon::now()->locale('es')
-        )
-        @php(
-            $authUser = session('auth_user')
-        )
-        @php(
-            $initial = $authUser && !empty($authUser['name'])
-                ? mb_strtoupper(mb_substr($authUser['name'], 0, 1))
-                : null
-        )
+        @php
+            $displayName = $authUser['name'] ?? 'Usuario SAFCO';
+        @endphp
         <header class="panel-header">
             <div class="headline">
                 <div class="kicker">Panel general</div>
                 <h1>
                     @if(!empty($authUser['name']))
-                        Hola {{ $authUser['name'] }}, este es tu centro de control SAFCO
+                        Hola {{ $displayName }}, este es tu centro de control SAFCO
                     @else
                         Hola, bienvenido(a) a tu centro de control SAFCO
                     @endif
                 </h1>
-                <p>{{ $today->isoFormat('dddd D [de] MMMM [de] YYYY') }}</p>
+                <p>{{ $today?->isoFormat('dddd D [de] MMMM [de] YYYY') }}</p>
             </div>
             <div class="actions">
                 <div class="search-bar">
@@ -451,14 +443,14 @@
                 </a>
                 <div class="user-pill">
                     <span class="avatar">
-                        @if($initial)
-                            {{ $initial }}
+                        @if(!empty($authUserInitial))
+                            {{ $authUserInitial }}
                         @else
                             <i class="bi bi-person-fill"></i>
                         @endif
                     </span>
                     <div class="user-meta">
-                        <span class="name">{{ $authUser['name'] ?? 'Usuario SAFCO' }}</span>
+                        <span class="name">{{ $displayName }}</span>
                         @if(!empty($authUser['email']))
                             <span class="email">{{ $authUser['email'] }}</span>
                         @endif

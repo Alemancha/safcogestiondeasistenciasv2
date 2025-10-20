@@ -14,9 +14,9 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // 4. TODAS las rutas protegidas
 Route::middleware(['checklogin'])->group(function () {
-    // Dashboard
-    Route::get('/', fn() => redirect('/dashboard'));
-    Route::get('/dashboard', fn() => view('dashboard'))->name('dashboard');
+    Route::redirect('/', '/dashboard');
+    Route::view('/dashboard', 'dashboard')->name('dashboard');
+
     // Todos tus CRUDs aquí
     Route::resource('empleados', App\Http\Controllers\EmpleadoController::class);
     Route::resource('cargos', App\Http\Controllers\CargoController::class);
@@ -26,12 +26,9 @@ Route::middleware(['checklogin'])->group(function () {
     Route::resource('asistencias', App\Http\Controllers\AsistenciaController::class);
     Route::resource('pagos', App\Http\Controllers\PagoController::class);
     Route::resource('usuarios', App\Http\Controllers\UsuarioController::class);
+
+    Route::get('/asistencias/export/pdf', [App\Http\Controllers\AsistenciaController::class, 'exportPdf'])->name('asistencias.export.pdf');
+    Route::get('empleados/export/pdf', [App\Http\Controllers\EmpleadoController::class, 'exportPdf'])->name('empleados.export.pdf');
+    Route::get('pagos/{pago}/boleta', [App\Http\Controllers\PagoController::class, 'boleta'])->name('pagos.boleta');
+    Route::get('pagos/export/pdf', [App\Http\Controllers\PagoController::class, 'exportPdf'])->name('pagos.export.pdf');
 });
-
-Route::resource('asistencias', App\Http\Controllers\AsistenciaController::class);
-
-Route::get('/asistencias/export/pdf', [App\Http\Controllers\AsistenciaController::class, 'exportPdf'])->name('asistencias.export.pdf');
-Route::get('empleados/export/pdf', [App\Http\Controllers\EmpleadoController::class, 'exportPdf'])->name('empleados.export.pdf');
-
-Route::get('pagos/{pago}/boleta', [App\Http\Controllers\PagoController::class, 'boleta'])->name('pagos.boleta');
-Route::get('pagos/export/pdf', [App\Http\Controllers\PagoController::class, 'exportPdf'])->name('pagos.export.pdf');

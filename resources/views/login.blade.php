@@ -196,6 +196,16 @@
       font-weight: 600;
     }
 
+    .alert-status {
+      background: rgba(16, 185, 129, 0.12);
+      border-left: 4px solid #059669;
+      color: #047857;
+      padding: 0.75rem 1rem;
+      border-radius: 0.9rem;
+      margin-bottom: 1.2rem;
+      font-weight: 600;
+    }
+
     .login-label {
       color: var(--text-main);
       font-weight: 600;
@@ -222,6 +232,11 @@
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
+    .login-input.is-invalid {
+      border-color: var(--safco-red);
+      background: rgba(229, 57, 53, 0.08);
+    }
+
     .login-input:focus {
       border-color: rgba(229, 57, 53, 0.35);
       box-shadow: 0 0 0 4px rgba(229, 57, 53, 0.08);
@@ -236,6 +251,14 @@
       color: rgba(100, 116, 139, 0.8);
       font-size: 1.25rem;
       cursor: pointer;
+    }
+
+    .input-error {
+      display: block;
+      margin-top: 0.35rem;
+      color: var(--safco-red-dark);
+      font-size: 0.85rem;
+      font-weight: 600;
     }
 
     .login-row {
@@ -352,21 +375,30 @@
         </div>
         <div class="login-title">Bienvenido a SAFCO <span class="emoji">👋</span></div>
         <div class="login-desc">Ingrese sus credenciales corporativas para acceder al panel de control.</div>
+        @if(session('status'))
+          <div class="alert-status"><i class='bx bxs-check-circle'></i>{{ session('status') }}</div>
+        @endif
         @if(session('error'))
           <div class="alert-error"><i class='bx bxs-error-circle'></i>{{ session('error') }}</div>
         @endif
-        @if ($errors->any())
-          <div class="alert-error"><i class='bx bxs-error-circle'></i>{{ $errors->first() }}</div>
-        @endif
+        @error('auth')
+          <div class="alert-error"><i class='bx bxs-error-circle'></i>{{ $message }}</div>
+        @enderror
         <label class="login-label" for="login-email">Email o Usuario</label>
         <div class="input-icon-box">
-          <input type="text" name="email" id="login-email" class="login-input" placeholder="Ingresa tu correo corporativo" autocomplete="username" required value="{{ old('email') }}">
+          <input type="text" name="email" id="login-email" class="login-input @error('email') is-invalid @enderror" placeholder="Ingresa tu correo corporativo" autocomplete="username" required value="{{ old('email') }}">
           <i class='bx bxs-user'></i>
+          @error('email')
+            <span class="input-error">{{ $message }}</span>
+          @enderror
         </div>
         <label class="login-label" for="login-password">Contraseña</label>
         <div class="input-icon-box">
-          <input type="password" name="password" id="login-password" class="login-input" placeholder="********" autocomplete="current-password" required>
+          <input type="password" name="password" id="login-password" class="login-input @error('password') is-invalid @enderror" placeholder="********" autocomplete="current-password" required>
           <i class='bx bx-hide' id="togglePassword" onclick="togglePassword()"></i>
+          @error('password')
+            <span class="input-error">{{ $message }}</span>
+          @enderror
         </div>
         <div class="login-row">
           <label for="remember" style="display:flex; align-items:center; color: var(--text-muted); font-weight:500;">

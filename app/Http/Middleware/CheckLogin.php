@@ -9,9 +9,15 @@ class CheckLogin
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!session()->has('auth_user')) {
+        $authUser = session('auth_user');
+
+        if (!is_array($authUser) || empty($authUser['id'])) {
+            $request->session()->forget('auth_user');
+            $request->session()->put('url.intended', $request->fullUrl());
+
             return redirect()->route('login');
         }
+
         return $next($request);
     }
 }
